@@ -1,8 +1,0 @@
-19:28:55.277 [main] INFO  - Loading the NetGraph from /Users/mattia/repositories/homework1/homework1/NetGameSimNetGraph_19-09-23-19-38-07.ngs
-19:28:55.382 [main] INFO  - Default output directory: /Users/mattia/repositories/homework1/homework1
-19:28:55.383 [main] ERROR - Output directory /Users/drmark/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/Github/NetGameSim/outputs does not exist or is not a directory, using current directory instead: /Users/mattia/repositories/homework1/homework1
-19:28:55.429 [main] INFO  - Loading the NetGraph from /Users/mattia/repositories/homework1/homework1/NetGameSimNetGraph_19-09-23-19-38-07.ngs.perturbed
-19:41:52.983 [main] INFO  - Loading the NetGraph from /Users/mattia/repositories/homework1/homework1/NetGameSimNetGraph_17-09-23-17-16-02.ngs
-19:41:53.274 [main] INFO  - Default output directory: /Users/mattia/repositories/homework1/homework1
-19:41:53.274 [main] ERROR - Output directory /Users/drmark/Library/CloudStorage/OneDrive-UniversityofIllinoisChicago/Github/NetGameSim/outputs does not exist or is not a directory, using current directory instead: /Users/mattia/repositories/homework1/homework1
-19:41:53.332 [main] INFO  - Loading the NetGraph from /Users/mattia/repositories/homework1/homework1/NetGameSimNetGraph_17-09-23-17-16-02.ngs.perturbed

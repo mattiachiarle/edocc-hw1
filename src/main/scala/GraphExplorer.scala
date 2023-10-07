@@ -63,8 +63,8 @@ object GraphExplorer {
     //If we analyze the perturbed graph, if a node is different from all the nodes in original it is an added node
 
     //Possible cases:
-    //0=removed
-    //1=added
+    //0=added
+    //1=removed
     //2=modified
     //3=same
 

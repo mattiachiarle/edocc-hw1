@@ -4,8 +4,11 @@ import org.apache.hadoop.io.{DoubleWritable, IntWritable, LongWritable, Text}
 import org.apache.hadoop.util.*
 import org.apache.hadoop.conf.*
 import org.apache.hadoop.io.*
+import org.yaml.snakeyaml.Yaml
+import scala.jdk.CollectionConverters._
+//import scala.collection.JavaConverters._
 
-import java.io.IOException
+import java.io.{File, FileInputStream, IOException, InputStreamReader}
 import java.util
 //import org.apache.hadoop.mapreduce.Job
 //import org.apache.hadoop.mapreduce.Mapper
@@ -23,12 +26,14 @@ import io.circe.generic.auto.*
 import io.circe.parser.*
 import io.circe.syntax.*
 import org.apache.hadoop.mapred.{JobClient, JobConf}
+import org.slf4j.LoggerFactory
 
 object MapReduceProgram:
   class Map extends MapReduceBase with Mapper[LongWritable, Text, LongWritable, LongWritable]:
     @throws[IOException]
     override def map(key: LongWritable, value: Text, output: OutputCollector[LongWritable, LongWritable], reporter: Reporter): Unit = {
-      println("Starting mapper")
+      val logger = LoggerFactory.getLogger(getClass)
+      //logger.info(s"Starting mapper - string=${value.toString}")
       val line = value.toString
       val elements = line.split("%%%")
       val analysisType = elements(0)
@@ -42,7 +47,7 @@ object MapReduceProgram:
 
         val similarity = ComputeSimilarity(original(0), original.drop(1), perturbed(0), perturbed.drop(1))
 
-        var result = 0
+        var result = 1
 
         if (similarity == 0) {
           result = 3
@@ -50,6 +55,8 @@ object MapReduceProgram:
         else if (similarity < 0.1) {
           result = 2
         }
+
+//        logger.info(s"Node ${original(0).id}: ${result}")
 
         //context.write(new LongWritable(original(0).id), new LongWritable(result));
         output.collect(new LongWritable(original(0).id), new LongWritable(result))
@@ -63,11 +70,14 @@ object MapReduceProgram:
 
         val similarity = ComputeSimilarity(perturbed(0), perturbed.drop(1), original(0), original.drop(1))
 
-        var result = 3
+        var result = 1
 
         if (similarity >= 0.1) {
-          result = 1
+//          logger.info(s"Similarity: ${similarity}")
+          result = 0
         }
+
+//        logger.info(s"Node ${perturbed(0).id}: ${result}")
 
         //context.write(new LongWritable(perturbed(0).id), new LongWritable(result));
         output.collect(new LongWritable(perturbed(0).id), new LongWritable(result))
@@ -127,27 +137,43 @@ object MapReduceProgram:
       }
   }
 
+    //Possible cases:
+    //0=added
+    //1=removed
+    //2=modified
+    //3=same
+
   class Reduce extends MapReduceBase with Reducer[LongWritable, LongWritable, LongWritable, LongWritable]:
     override def reduce(key: LongWritable, values: util.Iterator[LongWritable], output: OutputCollector[LongWritable, LongWritable], reporter: Reporter): Unit = {
-  //    var max : Long = -1
-  //    values.forEach(v => {
-  //      val vint = v.get()
-  //      if(vint > max){
-  //        max = vint
-  //      }
-  //    })
-      println("Starting reducer")
 
-      val max = values.asScala.reduce((valueOne, valueTwo) => new LongWritable(valueOne.get() max valueTwo.get()))
+      val logger = LoggerFactory.getLogger(getClass)
 
-      //context.write(key, new LongWritable(max))
-      output.collect(key, max)
+//      logger.info(s"Reducing for ${key} with:")
+//      values.asScala.foreach(v => logger.info(s"${v}"))
+
+      val newValues = values.asScala.map(v => v.get())
+
+      val max = newValues.max
+
+//      logger.info(s"Reducing for ${key} with:")
+//      values.asScala.foreach(v => logger.info(s"${v}"))
+
+//      logger.info(s"Reducing for ${key} completed, value: ${max}")
+//      var max = -1;
+//
+//      values.asScala.foreach(v => {
+//        if(v.get().toInt>max){
+//          max=v.get().toInt
+//        }
+//      })
+
+      output.collect(key, new LongWritable(max))
   }
 
   @main def runMapReduce(inputPath: String, outputPath: String) =
     val conf: JobConf = new JobConf(this.getClass)
     conf.setJobName("GraphAnalysis")
-    conf.set("fs.defaultFS", "local")
+    conf.set("fs.defaultFS", "file:///")
     conf.set("mapreduce.job.maps", "1")
     conf.set("mapreduce.job.reduces", "1")
     conf.setOutputKeyClass(classOf[LongWritable])
@@ -169,25 +195,109 @@ object MapReduceProgram:
 
     FileInputFormat.setInputPaths(conf, new Path(inputPath))
     FileOutputFormat.setOutputPath(conf, new Path(outputPath))
+
+    val logger = LoggerFactory.getLogger(getClass)
+
+//    logger.info("Starting mapreduce")
+
     JobClient.runJob(conf)
 
-  //  val input = new Path("./input")
-  //  val output = new Path("./output")
-  //
-  //  val fs = FileSystem.get(conf)
-  //
-  //  if (fs.exists(output)) {
-  //    fs.delete(output, true)
-  //  }
-  //
-  //  FileInputFormat.addInputPath(job, input)
-  //  FileOutputFormat.setOutputPath(job, output)
-  //
-  //  if (job.waitForCompletion(true)) {
-  //    //logger.info("Job completed successfully")
-  //    println("Success")
-  //  } else {
-  //    //logger.info("Job failed")
-  //    println("Failure")
-  //  }
+//    logger.info("Mapreduce successfully ended!")
+
+    val modified = mutable.ArrayBuffer[Int]()
+    val added = mutable.ArrayBuffer[Int]()
+    val removed = mutable.ArrayBuffer[Int]()
+
+    new File("output").listFiles.filter(_.getName.startsWith("part")).foreach(f => {
+      scala.io.Source.fromFile(f).getLines().foreach { line =>
+        val res = line.split("\t")
+        if(res(1).toInt == 1){
+          removed += res(0).toInt
+        }
+        else if(res(1).toInt == 0){
+          added += res(0).toInt
+        }
+        else if (res(1).toInt == 2) {
+          modified += res(0).toInt
+        }
+      }
+    })
+
+    print("Removed: ")
+    removed.foreach(r => print(s"${r}, "))
+    print("\n")
+    print("Added: ")
+    added.foreach(a => print(s"${a}, "))
+    print("\n")
+    print("Modified: ")
+    modified.foreach(m => print(s"${m}, "))
+    print("\n")
+
+    val cont = scala.io.Source.fromFile("NetGameSimNetGraph_17-09-23-17-16-02.ngs.yaml").mkString
+    val correct = cont.replace("\t","    ")
+    print(s"Cont: ${correct}")
+
+    val yaml = new Yaml()
+
+//    val data = yaml.load(correct).asInstanceOf[java.util.Map[String, Any]].asScala.toMap
+
+    val parsedData = yaml.load(correct).asInstanceOf[java.util.Map[String, Object]]
+    val nodesMap = parsedData.get("Nodes").asInstanceOf[java.util.Map[String, java.util.List[Int]]]
+    val modifiedNodes = Option(nodesMap.get("Modified")).getOrElse(new java.util.ArrayList[Int]()).asScala.toList
+    val removedNodes = Option(nodesMap.get("Removed")).getOrElse(new java.util.ArrayList[Int]()).asScala.toList
+
+    modifiedNodes.foreach(m => {
+      if(!modified.contains(m)){
+        logger.error(s"Node ${m} is not among modified nodes")
+      }
+    })
+
+    modified.foreach(m => {
+      if (!modifiedNodes.contains(m)) {
+        logger.error(s"Node ${m} is a wrong modified node")
+      }
+    })
+
+    removedNodes.foreach(r => {
+      if (!removed.contains(r)) {
+        logger.error(s"Node ${r} is not among removed nodes")
+      }
+    })
+
+    removed.foreach(r => {
+      if (!removedNodes.contains(r)) {
+        logger.error(s"Node ${r} is a wrong removed node")
+      }
+    })
+
+    var CTL = 0
+    var DTL = 0
+
+    removed.foreach(r => {
+      if(!removedNodes.contains(r)){
+        CTL += 1 //If we marked a node as removed while it was left in the graph, we wrongly removed a traceability link
+      }
+      else{
+        DTL += 1 //We correctly discarded a TL
+      }
+    })
+
+    var WTL = 0
+    //ATL = (total number - wrong_modified - wrong_removed)
+
+    removedNodes.foreach(r => {
+      if (!removed.contains(r)) {
+        WTL += 1 //A node that was removed has been considered as modified/same, so we wrongly maintained a traceability link
+      }
+    })
+
+    val BTL = CTL + WTL
+
+
+
+//    addedNodes.foreach(a => {
+//      if (!added.contains(a)) {
+//        logger.error(s"Node ${a} is not among modified nodes")
+//      }
+//    })
 

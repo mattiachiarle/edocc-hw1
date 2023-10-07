@@ -23,6 +23,6 @@ object Main {
 //      GraphView("NetGameSimNetGraph_17-09-23-17-16-02.ngs","NetGameSimNetGraph_17-09-23-17-16-02.ngs.perturbed")
 //      GraphAnalyze("NetGameSimNetGraph_19-09-23-19-38-07.ngs","NetGameSimNetGraph_19-09-23-19-38-07.ngs.perturbed")
 //      GraphAnalyze("NetGameSimNetGraph_17-09-23-17-16-02.ngs","NetGameSimNetGraph_17-09-23-17-16-02.ngs.perturbed")
-      CreateShards("input","NetGameSimNetGraph_19-09-23-19-38-07.ngs","NetGameSimNetGraph_19-09-23-19-38-07.ngs.perturbed")
+      CreateShards("input","NetGameSimNetGraph_17-09-23-17-16-02.ngs","NetGameSimNetGraph_17-09-23-17-16-02.ngs.perturbed")
   }
 }

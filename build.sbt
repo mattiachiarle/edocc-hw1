@@ -27,7 +27,10 @@ lazy val commonDependencies = Seq(
   "org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % "3.3.6",
   "io.circe" %% "circe-core" % "0.14.5",
   "io.circe" %% "circe-generic" % "0.14.5",
-  "io.circe" %% "circe-parser" % "0.14.5"
+  "io.circe" %% "circe-parser" % "0.14.5",
+  "org.typelevel" %% "jawn-parser" % "1.4.0",
+  "ch.qos.logback" % "logback-classic" % "1.4.7",
+  "org.yaml" % "snakeyaml" % "2.0"
 )
 
 lazy val GenericSimUtilities = (project in file("GenericSimUtilities"))
@@ -60,5 +63,6 @@ scalacOptions ++= Seq(
 
 lazy val root = (project in file("."))
   .settings(
-    name := "homework1"
+    name := "homework1",
+    libraryDependencies ++= commonDependencies
   )
