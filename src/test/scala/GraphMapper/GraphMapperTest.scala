@@ -7,11 +7,14 @@ import org.slf4j.LoggerFactory
 import NetGraphAlgebraDefs.*
 import GraphMapper.*
 import com.typesafe.config.ConfigFactory
-import GraphMapper.computeStatistics
+import Statistics.*
 
 import scala.Double.NaN
 import scala.collection.mutable
 
+/**
+ * In the tests I focused only on the function that computes the similarity. In fact, this is the critical part of the algorithm, and it's important to have those test to perform regression testing.
+ */
 class GraphMapperTest extends AnyFlatSpec with Matchers{
   val logger: Logger = LoggerFactory.getLogger(getClass)
   behavior of "Compute similarity"

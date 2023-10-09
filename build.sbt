@@ -22,9 +22,9 @@ lazy val commonDependencies = Seq(
   "com.typesafe" % "config" % typeSafeConfigVersion,
   "ch.qos.logback" % "logback-classic" % logbackVersion,
   "net.bytebuddy" % "byte-buddy" % netBuddyVersion,
-  "org.apache.hadoop" % "hadoop-common" % "3.3.6",
-  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.6",
-  "org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % "3.3.6",
+  "org.apache.hadoop" % "hadoop-common" % "3.3.3",
+  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.3",
+  "org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % "3.3.3",
   "io.circe" %% "circe-core" % "0.14.5",
   "io.circe" %% "circe-generic" % "0.14.5",
   "io.circe" %% "circe-parser" % "0.14.5",
@@ -32,6 +32,15 @@ lazy val commonDependencies = Seq(
   "ch.qos.logback" % "logback-classic" % "1.4.7",
   "org.yaml" % "snakeyaml" % "2.0"
 )
+
+assemblyExcludedJars in assembly := {
+  val excludedJar = "lib/netgame.jar"
+
+  (fullClasspath in assembly).value.filter { cp =>
+    val jarPath = cp.data.getPath
+    !jarPath.endsWith(excludedJar)
+  }
+}
 
 lazy val GenericSimUtilities = (project in file("GenericSimUtilities"))
   .settings(
@@ -66,3 +75,4 @@ lazy val root = (project in file("."))
     name := "homework1",
     libraryDependencies ++= commonDependencies
   )
+
