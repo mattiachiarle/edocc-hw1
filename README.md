@@ -61,3 +61,5 @@ In the code, I also saved the node that provided that result in the other graph.
 The reducer will take the maximum among all the values provided by the mapper.
 For task 1, same has of course the highest priority. Modified is immediately after. The idea is that almost all mappers will provide 1 as result for a certain node (we have at most one correspondence), but if at least one provided 2 or 3 we take that value.
 For task 2 instead, all the nodes will be marked with added (again, we have at most one correspondence). If we have at least one comparison below the threshold, the node is marked as "removed" and it won't be placed among the added nodes. Please notice that, since in the worst case in Task 1 we get 1 as result, all the nodes analyzed in Task 1 won't be affected by Task 2.
+
+The overall result is a CVS file, with format {node},{result},{node in the other graph that caused this result}.
