@@ -33,15 +33,6 @@ lazy val commonDependencies = Seq(
   "org.yaml" % "snakeyaml" % "2.0"
 )
 
-assemblyExcludedJars in assembly := {
-  val excludedJar = "lib/netgame.jar"
-
-  (fullClasspath in assembly).value.filter { cp =>
-    val jarPath = cp.data.getPath
-    !jarPath.endsWith(excludedJar)
-  }
-}
-
 lazy val GenericSimUtilities = (project in file("GenericSimUtilities"))
   .settings(
     scalaVersion := "3.2.2",

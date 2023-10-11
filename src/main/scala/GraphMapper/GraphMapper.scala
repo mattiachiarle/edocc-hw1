@@ -118,9 +118,9 @@ object GraphMapper:
         val original = optionOriginal.collect { case Some(nodeObject) => nodeObject } //To remove the option
         val perturbed = optionPerturbed.collect { case Some(nodeObject) => nodeObject }
 
-        val similarity = ComputeSimilarity(original(0), original.drop(1), perturbed(0), perturbed.drop(1)) //We compute the similarity
+        val similarity = ComputeSimilarity(original(0), original.drop(1), perturbed(0), perturbed.drop(1)) //We compute the similarity. We also remove the original and perturbed nodes analyzed from the array of neighbors 
 
-        var result = 1 //In the task 1, the most common case is the one in which the node will result removed, or, in other words, different than the other ndoe
+        var result = 1 //In the task 1, the most common case is the one in which the node will result removed, or, in other words, different than the other node
 
         if (similarity == 0) {
           result = 3 //The nodes are the same
@@ -180,8 +180,12 @@ object GraphMapper:
 
     val conf: JobConf = new JobConf(this.getClass)
     conf.setJobName("GraphAnalysis")
-    //When running the program locally, uncomment the following line to enable auto deletion of output directory
+    
+    /*
+      When running the program locally, uncomment the following line to enable auto deletion of output directory
+    */
 //    conf.set("fs.defaultFS", "file:///")
+
     conf.set("mapreduce.job.maps", nMappers)
     conf.set("mapreduce.job.reduces", nReducers)
     conf.setOutputKeyClass(classOf[LongWritable])
@@ -192,7 +196,10 @@ object GraphMapper:
     conf.setOutputFormat(classOf[TextOutputFormat[Text, Text]])
 
 
-    //When running the program locally, uncomment the following lines to enable auto deletion of output directory
+    /*
+      When running the program locally, uncomment the following line to enable auto deletion of output directory
+    */
+    
 //    val fs = FileSystem.get(conf)
 //
 //    val output = new Path(outputPath)
