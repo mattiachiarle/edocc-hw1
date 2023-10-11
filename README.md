@@ -32,6 +32,7 @@ I also don't exclude that, by performing fine-graded tests, it could be possible
 ## Results with a graph of 300 nodes
 
 CTL: 6, DTL: 14, WTL: 1, ATL: 296
+
 Statistics: ACC = 0.9337539432176656, BTLR = 0.0031545741324921135, VPR = 0.9779179810725552
 
 ## Mapper and reducers logic
