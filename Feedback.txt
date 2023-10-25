@@ -1,0 +1,7 @@
+Student - Mattia Chiarle
+
+=> No logging = -1%
+
+Your code is clean and documentation is good. Good solution too! Great job!
+
+Grade = 14%
