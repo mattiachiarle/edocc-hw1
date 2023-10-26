@@ -1,7 +1,9 @@
 Student - Mattia Chiarle
 
-=> No logging = -1%
+=> Some logging = -0.5%
 
-Your code is clean and documentation is good. Good solution too! Great job!
+Your code is clean and documentation is good. Good solution too! 
+However, going forward, please use more logging statements in your code. You can look at NetGameSim for inspiration on how to use slf4j more effectively (using info, error, etc logging levels).
+Great job overall!
 
-Grade = 14%
+Grade = 14.5%
